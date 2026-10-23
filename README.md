@@ -120,33 +120,27 @@ The validated sequential funnel for November 2019 produced the following results
 
 *Rates are rounded to two decimal places. The calculations use product-view journeys as the starting population.*
 
-## 7. Key Insights
+## Key Insights
 
-### Insight 1 — The largest observed drop-off occurs before adding to cart
+### 1. The largest drop-off occurs before cart addition
 
-Approximately 95.14% of product-view journeys did not progress to a qualifying cart event.
+Only 4.86% of product-session journeys with a view progressed to a qualifying cart event. This indicates that the view-to-cart stage is the main observed conversion bottleneck in this funnel.
 
-This makes the product-view-to-cart transition a reasonable starting point for further investigation.
+### 2. A smaller share of journeys progresses beyond the cart
 
-Potential factors include product information quality, pricing, product availability, delivery expectations, and add-to-cart usability. These are hypotheses, not proven causes.
+Of journeys that reached the cart after a view, 34.66% subsequently recorded a purchase event. This suggests an opportunity to investigate friction between cart addition and purchase.
 
-### Insight 2 — A smaller share of carted journeys progress to purchase
+### 3. Overall sequential conversion is low
 
-Approximately 34.66% of journeys with a qualifying cart event progressed to a sequential purchase event.
+The reported view-to-purchase conversion rate was 1.68% at the product-session-product journey level.
 
-This suggests a second area worth investigating: cart and checkout friction.
+These findings are descriptive. They identify where users drop out of the observed funnel but do not establish why they drop out.
 
-Potential factors include unexpected delivery charges, payment issues, complicated checkout flows, and delivery estimates.
+### Measurement approach
 
-The event data does not independently establish which factor, if any, explains abandonment.
+Establish a baseline, run controlled A/B tests where feasible, and compare conversion rates alongside guardrail metrics such as average order value, refunds, and checkout errors.
 
-### Insight 3 — Conversion metrics require clear definitions
-
-Counting views, cart events, and purchases independently can produce misleading funnel interpretations.
-
-Defining a journey and enforcing event order provides a more meaningful view of observed progression.
-
-However, a sequential event pattern does not prove that the preceding event caused the purchase.
+Do not assume that a proposed change will improve conversion until its impact is measured.
 
 ## 8. Product Recommendations
 
@@ -172,13 +166,13 @@ No conversion uplift is claimed because no controlled experiment has been conduc
 
 ## 9. Limitations
 
-- The analysis covers November 2019 and may not reflect current e-commerce behavior.
-- The funnel measures product-session journeys, not unique customers or orders.
-- Repeated events and multiple journeys from the same user can affect interpretation.
-- Sequential event progression does not establish causality.
-- Missing category or brand values may affect category-level analysis.
-- Category and brand aggregation requires further validation.
-- Revenue, profit, returns, and checkout-specific friction have not been quantified in this analysis.
+- **Journey-level metrics:** Results represent product-session-product journeys, not unique customers, orders, or revenue.
+- **Observational analysis:** The funnel shows associations and progression, not the causes of abandonment.
+- **Event tracking:** Missing or incorrectly recorded events may affect measured conversion.
+- **Time boundaries:** The analysis covers events recorded in the November 2019 dataset. Journeys spanning the dataset's time boundaries may be incomplete.
+- **Category analysis:** Category-level results should be validated independently before drawing conclusions.
+- **No causal testing:** Product recommendations are hypotheses and require controlled experiments or further analysis.
+- **Reproducibility:** Reported metrics must be checked against the saved SQL queries before being treated as independently verified results.
 
 These limitations should be considered before using the findings to make business decisions.
 
