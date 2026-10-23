@@ -96,11 +96,19 @@ purchase_after_cart AS (
 
 funnel_counts AS (
     SELECT
-        (SELECT COUNT(*) FROM first_view) AS viewed_journeys,
-        (SELECT COUNT(*) FROM cart_after_view) AS cart_after_view,
-        (SELECT COUNT(*) FROM purchase_after_cart) AS completed_sequentially
-)
+        (SELECT COUNT(*)
+         FROM first_view) AS viewed_journeys,
 
+        (SELECT COUNT(*)
+         FROM cart_after_view
+         WHERE cart_time IS NOT NULL) AS cart_after_view,
+
+        (SELECT COUNT(*)
+         FROM purchase_after_cart
+         WHERE cart_time IS NOT NULL
+           AND purchase_time IS NOT NULL
+        ) AS completed_sequentially
+)
 SELECT
     viewed_journeys,
     cart_after_view,
