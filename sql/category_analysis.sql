@@ -103,8 +103,8 @@ category_funnel AS (
     SELECT
         v.category_code,
         COUNT(*) AS viewed_journeys,
-        COUNT(c.product_id) AS carted_journeys,
-        COUNT(p.product_id) AS completed_journeys
+        COUNT(c.cart_time) AS carted_journeys,
+        COUNT(p.purchase_time) AS completed_journeys
     FROM first_view v
     LEFT JOIN cart_after_view c
       ON c.user_id = v.user_id
