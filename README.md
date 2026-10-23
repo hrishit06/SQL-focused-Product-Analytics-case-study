@@ -82,6 +82,10 @@ Built a funnel that requires:
 
 This is more precise than counting event types without considering their order.
 
+## Funnel Visualization
+
+![E-commerce Conversion Funnel](visuals/funnel_chart.png)
+
 ### Step 4 — Conversion measurement
 
 Calculated the following metrics:
