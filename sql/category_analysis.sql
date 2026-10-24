@@ -15,7 +15,14 @@
 -- Compare sequential view -> cart -> purchase progression
 -- across product categories.
 
-WITH events AS (
+
+-- Project: E-commerce Funnel Analysis
+-- File: category_analysis.sql
+-- SQL engine: DuckDB
+-- Journey grain: user_id + user_session + product_id
+-- Category attribution: category_code from the earliest view
+
+WITH raw_events AS (
     SELECT
         user_id,
         user_session,
@@ -30,7 +37,6 @@ WITH events AS (
       AND user_id IS NOT NULL
       AND user_session IS NOT NULL
       AND product_id IS NOT NULL
-      AND category_code IS NOT NULL
 ),
 
 first_view AS (
@@ -38,15 +44,24 @@ first_view AS (
         user_id,
         user_session,
         product_id,
-        category_code,
-        MIN(event_time) AS view_time
-    FROM events
-    WHERE event_type = 'view'
-    GROUP BY
-        user_id,
-        user_session,
-        product_id,
+        event_time AS view_time,
         category_code
+    FROM (
+        SELECT
+            user_id,
+            user_session,
+            product_id,
+            event_time,
+            category_code,
+            ROW_NUMBER() OVER (
+                PARTITION BY user_id, user_session, product_id
+                ORDER BY event_time, category_code NULLS LAST
+            ) AS rn
+        FROM raw_events
+        WHERE event_type = 'view'
+    ) ranked_views
+    WHERE rn = 1
+      AND category_code IS NOT NULL
 ),
 
 cart_after_view AS (
@@ -58,11 +73,10 @@ cart_after_view AS (
         v.view_time,
         MIN(e.event_time) AS cart_time
     FROM first_view v
-    LEFT JOIN events e
+    LEFT JOIN raw_events e
       ON e.user_id = v.user_id
      AND e.user_session = v.user_session
      AND e.product_id = v.product_id
-     AND e.category_code = v.category_code
      AND e.event_type = 'cart'
      AND e.event_time >= v.view_time
     GROUP BY
@@ -83,11 +97,11 @@ purchase_after_cart AS (
         c.cart_time,
         MIN(e.event_time) AS purchase_time
     FROM cart_after_view c
-    LEFT JOIN events e
+    LEFT JOIN raw_events e
       ON e.user_id = c.user_id
      AND e.user_session = c.user_session
      AND e.product_id = c.product_id
-     AND e.category_code = c.category_code
+     AND c.cart_time IS NOT NULL
      AND e.event_type = 'purchase'
      AND e.event_time >= c.cart_time
     GROUP BY
@@ -124,25 +138,18 @@ SELECT
     viewed_journeys,
     carted_journeys,
     completed_journeys,
-
     ROUND(
         100.0 * carted_journeys
-        / NULLIF(viewed_journeys, 0),
-        2
+        / NULLIF(viewed_journeys, 0), 2
     ) AS view_to_cart_pct,
-
     ROUND(
         100.0 * completed_journeys
-        / NULLIF(carted_journeys, 0),
-        2
+        / NULLIF(carted_journeys, 0), 2
     ) AS cart_to_purchase_pct,
-
     ROUND(
         100.0 * completed_journeys
-        / NULLIF(viewed_journeys, 0),
-        2
+        / NULLIF(viewed_journeys, 0), 2
     ) AS overall_conversion_pct
-
 FROM category_funnel
 WHERE viewed_journeys >= 100
 ORDER BY overall_conversion_pct DESC;
